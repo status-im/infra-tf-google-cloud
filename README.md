@@ -17,9 +17,9 @@ module "google-cloud" {
 
 * __Scaling__
   * `count` - Number of hosts to start in this zone.
-  * `image` - OS image used to create host. (default: `ubuntu-18-04-x64`)
-  * `type` - Type of machine to deploy. (default: `s-1vcpu-1gb`)
-  * `zone` - Specific zone in which to deploy hosts. (default: `ams3`)
+  * `image` - OS image used to create host. (default: `ubuntu-os-cloud/ubuntu-1804-lts`)
+  * `type` - Type of machine to deploy. (default: `n1-standard-1`)
+  * `zone` - Specific zone in which to deploy hosts. (default: `us-central1-a`)
   * `vol_size` - Size of the base image. (default: `10`)
 * __General__
   * `name` - Prefix of hostname before index. (default: `node`)
