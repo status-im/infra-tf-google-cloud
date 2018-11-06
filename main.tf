@@ -20,8 +20,9 @@ locals = {
 }
 
 resource "google_compute_address" "host" {
-  name  = "${var.name}-${format("%02d", count.index+1)}-${local.dc}-${var.env}-${local.stage}"
-  count = "${var.count}"
+  name       = "${var.name}-${format("%02d", count.index+1)}-${local.dc}-${var.env}-${local.stage}"
+  count      = "${var.count}"
+  lifecycle  = { prevent_destroy = true }
 }
 
 resource "google_compute_firewall" "host" {
@@ -45,6 +46,8 @@ resource "google_compute_instance" "host" {
   count = "${var.count}"
 
   machine_type = "${var.type}"
+  /* enable changing machine_type */
+  allow_stopping_for_update = true
 
   tags = ["${local.tags_sorted}"]
 
@@ -53,6 +56,11 @@ resource "google_compute_instance" "host" {
       image = "${var.image}"
       size  = "${var.vol_size}"
     }
+  }
+
+  /* Ignore changes to size of boot_disk */
+  lifecycle = {
+    ignore_changes = ["size"]
   }
 
   network_interface {
@@ -66,9 +74,9 @@ resource "google_compute_instance" "host" {
     node     = "${var.name}"
     env      = "${var.env}"
     group    = "${var.group}"
-    # This is a hack because we can't use dots in actual instance name
+    /* This is a hack because we can't use dots in actual instance name */
     hostname = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
-    # Enable SSH access
+    /* Enable SSH access */
     sshKeys  = "${var.ssh_user}:${file(var.ssh_key)}"
   }
 
@@ -78,7 +86,7 @@ resource "google_compute_instance" "host" {
       playbook = {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
-      groups   = ["${var.group}"]
+      groups = ["${var.group}"]
       extra_vars = {
         hostname         = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
         ansible_ssh_user = "${var.ssh_user}"
