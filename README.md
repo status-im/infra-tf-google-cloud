@@ -1,23 +1,17 @@
 # Description
 
-This is a helper module used by Status internal repos like:
-
-* https://github.com/status-im/infra-hq
-* https://github.com/status-im/infra-misc
-* https://github.com/status-im/infra-eth-cluster
-* https://github.com/status-im/infra-swarm
+This is a helper module used by Status internal repos like: [infra-hq](https://github.com/status-im/infra-hq), [infra-misc](https://github.com/status-im/infra-misc), [infra-eth-cluster](https://github.com/status-im/infra-eth-cluster), or [infra-swarm](https://github.com/status-im/infra-swarm).
 
 # Usage
 
 Simply import the modue using the `source` directive:
-```terraform
+```hcl
 module "google-cloud" {
   source = "github.com/status-im/infra-tf-google-cloud"
 }
 ```
 
-For more details see:
-https://www.terraform.io/docs/modules/sources.html#github
+[More details.](https://www.terraform.io/docs/modules/sources.html#github)
 
 # Variables
 
