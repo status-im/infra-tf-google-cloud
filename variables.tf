@@ -10,6 +10,12 @@ variable type {
   default     = "n1-standard-1"
 }
 
+variable vol_size {
+  description = "Size of the base image."
+  /* 0 should default to size of base image */
+  default     = 10
+}
+
 variable zone {
   description = "Specific zone in which to deploy hosts."
   # https://cloud.google.com/compute/docs/regions-zones/
