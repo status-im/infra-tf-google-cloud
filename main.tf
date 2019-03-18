@@ -102,7 +102,7 @@ resource "cloudflare_record" "host" {
   domain = "${var.domain}"
   count  = "${var.count}"
   name   = "${element(google_compute_instance.host.*.metadata.hostname, count.index)}"
-  value  = "${element(google_compute_instance.host.*.network_interface.0.access_config.0.assigned_nat_ip , count.index)}"
+  value  = "${element(google_compute_instance.host.*.network_interface.0.access_config.0.nat_ip , count.index)}"
   type   = "A"
   ttl    = 3600
 }
