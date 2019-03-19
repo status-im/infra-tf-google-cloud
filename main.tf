@@ -114,7 +114,7 @@ resource "ansible_host" "host" {
   count = "${var.count}"
   vars {
     ansible_user   = "admin"
-    ansible_host   = "${element(google_compute_instance.host.*.network_interface.0.access_config.0.assigned_nat_ip , count.index)}"
+    ansible_host   = "${element(google_compute_instance.host.*.network_interface.0.access_config.0.nat_ip , count.index)}"
     hostname       = "${element(google_compute_instance.host.*.metadata.hostname, count.index)}"
     region         = "${element(google_compute_instance.host.*.zone, count.index)}"
     dns_entry      = "${element(google_compute_instance.host.*.metadata.hostname, count.index)}.${var.domain}"
