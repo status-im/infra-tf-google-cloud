@@ -89,6 +89,7 @@ resource "google_compute_instance" "host" {
       groups = ["${var.group}"]
       extra_vars = {
         hostname         = "${var.name}-${format("%02d", count.index+1)}.${local.dc}.${var.env}.${local.stage}"
+        ansible_host     = "${element(google_compute_address.host.*.address, count.index)}"
         ansible_ssh_user = "${var.ssh_user}"
         data_center      = "${local.dc}"
         stage            = "${local.stage}"
