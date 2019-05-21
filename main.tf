@@ -38,6 +38,15 @@ resource "google_compute_firewall" "host" {
     protocol = "udp"
     ports    = ["${local.open_ports}"]
   }
+  /* optional DDoS mitigation by blocking IP ranges */
+  deny {
+    protocol      = "tcp"
+    source_ranges = ["${var.blocked_ips}"]
+  }
+  deny {
+    protocol      = "udp"
+    source_ranges = ["${var.blocked_ips}"]
+  }
 }
 
 resource "google_compute_instance" "host" {

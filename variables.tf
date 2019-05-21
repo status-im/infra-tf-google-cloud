@@ -73,3 +73,10 @@ variable open_ports {
   type        = "list"
   default     = []
 }
+
+/* See: https://www.terraform.io/docs/providers/google/r/compute_firewall.html */
+variable blocked_ips {
+  description = "List of source IP ranges for which we want to block access."
+  type        = "list"
+  default     = []
+}

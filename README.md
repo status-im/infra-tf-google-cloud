@@ -30,3 +30,4 @@ module "google-cloud" {
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `ssh_keys` - Names of ssh public keys to add to created hosts.
   * `open_ports` - Port ranges to enable access from outside. Format: `N-N` (default: `[]`)
+  * `blocked_ips` - IP Address ranges to block. Format: [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (default: `[]`)
