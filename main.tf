@@ -38,6 +38,14 @@ resource "google_compute_firewall" "host" {
     protocol = "udp"
     ports    = ["${local.open_ports}"]
   }
+}
+
+resource "google_compute_firewall" "deny" {
+  name        = "deny-${var.name}-${var.zone}-${var.env}-${local.stage}"
+  network     = "default"
+  target_tags = ["${var.name}-${var.env}-${local.stage}"]
+  count       = "${length(var.blocked_ips) > 0 ? 1 : 0}"
+
   /* optional DDoS mitigation by blocking IP ranges */
   deny {
     protocol      = "tcp"
