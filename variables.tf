@@ -1,6 +1,6 @@
 /* SCALING ---------------------------------------*/
 
-variable "count" {
+variable "host_count" {
   description = "Number of hosts to run."
 }
 

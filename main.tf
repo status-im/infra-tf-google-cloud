@@ -17,7 +17,7 @@ locals {
 
 resource "google_compute_address" "host" {
   name  = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
-  count = var.count
+  count = var.host_count
   lifecycle {
     prevent_destroy = true
   }
@@ -59,7 +59,7 @@ resource "google_compute_firewall" "deny" {
 resource "google_compute_instance" "host" {
   name  = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
   zone  = var.zone
-  count = var.count
+  count = var.host_count
 
   machine_type = var.type
 
@@ -118,7 +118,7 @@ resource "google_compute_instance" "host" {
 
 resource "cloudflare_record" "host" {
   domain = var.domain
-  count  = var.count
+  count  = var.host_count
   name   = google_compute_instance.host[count.index].metadata.hostname,
   value  = google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip,
   type   = "A"
@@ -129,7 +129,7 @@ resource "ansible_host" "host" {
   inventory_hostname = google_compute_instance.host[count.index].metadata.hostname,
 
   groups = [var.group, local.dc]
-  count  = var.count
+  count  = var.host_count
 
   vars = {
     ansible_user = "admin"
