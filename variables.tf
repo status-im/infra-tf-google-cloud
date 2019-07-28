@@ -32,7 +32,7 @@ variable "image" {
   default = "ubuntu-os-cloud/ubuntu-1804-lts"
 }
 
-variable "provider" {
+variable "provider_name" {
   description = "Short name of the provider used."
 
   /* Google Cloud */
