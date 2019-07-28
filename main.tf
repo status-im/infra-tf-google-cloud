@@ -126,7 +126,7 @@ resource "cloudflare_record" "host" {
 }
 
 resource "ansible_host" "host" {
-  inventory_hostname = google_compute_instance.host[count.index].metadata.hostname,
+  inventory_hostname = google_compute_instance.host[count.index].metadata.hostname
 
   groups = [var.group, local.dc]
   count  = var.host_count
