@@ -4,7 +4,7 @@ locals {
   stage = terraform.workspace
   dc    = "${var.provider_name}-${var.zone}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = ["22", "655", "8000", "8301", var.open_ports]
+  open_ports = concat(["22", "655", "8000", "8301"], var.open_ports)
 
   tags = [
     var.name, local.stage, var.env,
