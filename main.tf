@@ -103,7 +103,10 @@ resource "google_compute_instance" "host" {
       playbook {
         file_path = "${path.cwd}/ansible/bootstrap.yml"
       }
+
+      hosts  = [self.network_interface.0.access_config.0.nat_ip]
       groups = [var.group]
+
       extra_vars = {
         hostname         = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
         ansible_host     = google_compute_address.host[count.index].address
