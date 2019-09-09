@@ -39,12 +39,6 @@ variable "provider_name" {
   default = "gc"
 }
 
-variable "min_cpu_platform" {
-  description = "Specifies a minimum CPU platform for the VM instance."
-  /* https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform */
-  default     = "Intel Cascade Lake"
-}
-
 /* CONFIG ----------------------------------------*/
 
 variable "name" {

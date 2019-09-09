@@ -62,7 +62,6 @@ resource "google_compute_instance" "host" {
   count = var.host_count
 
   machine_type     = var.type
-  min_cpu_platform = var.min_cpu_platform
 
   /* enable changing machine_type */
   allow_stopping_for_update = true
