@@ -4,7 +4,8 @@ locals {
   stage = terraform.workspace
   dc    = "${var.provider_name}-${var.zone}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_ports = concat(["22", "655", "8000", "8301"], var.open_ports)
+  open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
+  open_udp_ports = concat(["8301"], var.open_udp_ports)
 
   tags = [
     var.name, local.stage, var.env,
@@ -30,11 +31,11 @@ resource "google_compute_firewall" "host" {
 
   allow {
     protocol = "tcp"
-    ports = local.open_ports
+    ports = local.open_tcp_ports
   }
   allow {
     protocol = "udp"
-    ports = local.open_ports
+    ports = local.open_udp_ports
   }
 }
 

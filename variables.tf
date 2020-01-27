@@ -82,8 +82,14 @@ variable "ssh_key" {
 
 /* FIREWALL -------------------------------------------*/
 
-variable "open_ports" {
-  description = "Port ranges to enable access from outside. Format: 'N-N'"
+variable "open_tcp_ports" {
+  description = "TCP port ranges to enable access from outside. Format: 'N-N'"
+  type        = list(string)
+  default     = []
+}
+
+variable "open_udp_ports" {
+  description = "UDP port ranges to enable access from outside. Format: 'N-N'"
   type        = list(string)
   default     = []
 }
