@@ -36,8 +36,8 @@ variable "zone" {
 variable "image" {
   description = "OS image to use when deploying hosts."
 
-  /* https://cloud.google.com/compute/docs/images */
-  default = "ubuntu-os-cloud/ubuntu-1804-lts"
+  /* Use: 'gcloud compute images list --filter=ubuntu' */
+  default = "ubuntu-os-cloud/ubuntu-2004-lts"
 }
 
 variable "provider_name" {
