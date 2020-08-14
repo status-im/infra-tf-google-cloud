@@ -90,6 +90,14 @@ resource "google_compute_instance" "host" {
     }
   }
 
+  dynamic "attached_disk" {
+    for_each = google_compute_disk.host
+    content {
+      device_name = "persistent-disk-${count.index+1}"
+      source      = google_compute_disk.host[count.index].self_link
+    }
+  }
+
   /* Ignore changes to size of boot_disk */
   lifecycle {
     ignore_changes = [ boot_disk ]
@@ -132,12 +140,6 @@ resource "google_compute_instance" "host" {
       }
     }
   }
-}
-
-resource "google_compute_attached_disk" "host" {
-  disk     = google_compute_disk.host[count.index].id
-  instance = google_compute_instance.host[count.index].id
-  count    = var.data_vol_size > 0 ? var.host_count : 0
 }
 
 resource "cloudflare_record" "host" {
