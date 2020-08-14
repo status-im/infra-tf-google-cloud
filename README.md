@@ -20,7 +20,7 @@ module "google-cloud" {
   * `image` - OS image used to create host. (default: `ubuntu-os-cloud/ubuntu-1804-lts`)
   * `type` - Type of machine to deploy. (default: `n1-standard-1`)
   * `zone` - Specific zone in which to deploy hosts. (default: `us-central1-a`)
-  * `vol_size` - Size of the base image. (default: `10`)
+  * `root_vol_size` - Size of the base/root image. (default: `10`)
   * `data_vol_type` - Type of the extra data volume. (default: `pd-balanced`)
   * `data_vol_size` - Size of the extra data volume. (default: `0`)
 * __General__

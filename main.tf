@@ -86,7 +86,7 @@ resource "google_compute_instance" "host" {
   boot_disk {
     initialize_params {
       image = var.image
-      size  = var.vol_size
+      size  = var.root_vol_size
     }
   }
 

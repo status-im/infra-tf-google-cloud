@@ -19,7 +19,7 @@ variable "type" {
   default = "n1-standard-1"
 }
 
-variable "vol_size" {
+variable "root_vol_size" {
   description = "Size of the base image."
 
   /* 0 should default to size of base image */
