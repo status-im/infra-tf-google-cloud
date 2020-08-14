@@ -57,6 +57,20 @@ resource "google_compute_firewall" "deny" {
   }
 }
 
+resource "google_compute_disk" "host" {
+  name  = "data-${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
+  type  = var.data_vol_type
+  zone  = var.zone
+  size  = var.data_vol_size
+  count = var.data_vol_size > 0 ? var.host_count : 0
+
+  lifecycle {
+    prevent_destroy = true
+    /* We do this to avoid destrying a volume unnecesarily */
+    ignore_changes = [ name ]
+  }
+}
+
 resource "google_compute_instance" "host" {
   name  = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
   zone  = var.zone
@@ -118,6 +132,12 @@ resource "google_compute_instance" "host" {
       }
     }
   }
+}
+
+resource "google_compute_attached_disk" "host" {
+  disk     = google_compute_disk.host[count.index].id
+  instance = google_compute_instance.host[count.index].id
+  count    = var.data_vol_size > 0 ? var.host_count : 0
 }
 
 resource "cloudflare_record" "host" {

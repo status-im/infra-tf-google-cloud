@@ -26,6 +26,17 @@ variable "vol_size" {
   default = 10
 }
 
+variable "data_vol_type" {
+  description = "Type of the extra data volume."
+  /* Use: gcloud compute disk-types list */
+  default = "pd-balanced"
+}
+
+variable "data_vol_size" {
+  description = "Size of the extra data volume."
+  default = 0
+}
+
 variable "zone" {
   description = "Specific zone in which to deploy hosts."
 
