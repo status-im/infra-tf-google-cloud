@@ -63,18 +63,32 @@ variable "provider_name" {
 variable "name" {
   description = "Name for hosts. To be used in the DNS entry."
   default     = "node"
+  type        = string
 }
 
 variable "env" {
   description = "Environment for these hosts, affects DNS entries."
+  type        = string
 }
 
 variable "group" {
   description = "Ansible group to assign hosts to."
+  type        = string
 }
 
 variable "domain" {
   description = "DNS Domain to update"
+  type        = string
+}
+
+variable "ps_setup_script" {
+  description = "PowerShell script for initial setup of Windows host."
+  type        = string
+}
+
+variable "ps_startup_scipt" {
+  description = "PowerShell script for setup at every Windows host boot."
+  type        = string
 }
 
 /* MODULE ----------------------------------------*/
@@ -82,11 +96,12 @@ variable "domain" {
 variable "ssh_user" {
   description = "User used to log in to instance"
   default     = "root"
+  type        = string
 }
 
 variable "ssh_key" {
   description = "Names of ssh public keys to add to created hosts"
-
+  type        = string
   /* TODO this needs to be dynamic */
   default = "~/.ssh/status.im/id_rsa.pub"
 }

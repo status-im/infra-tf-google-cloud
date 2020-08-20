@@ -118,6 +118,9 @@ resource "google_compute_instance" "host" {
     hostname = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
     /* Enable SSH access */
     sshKeys = "${var.ssh_user}:${file(var.ssh_key)}"
+    /* Run PowerShell script to setup a Window machine */
+    sysprep-specialize-script-ps1 = var.ps_setup_script
+    windows-startup-script-ps1    = var.ps_startup_scipt
   }
 
   /* bootstrap access to host and basic resources */

@@ -28,6 +28,7 @@ module "google-cloud" {
   * `group` - Name of Ansible group to add hosts to.
   * `env` - Environment for these hosts, affects DNS entries.
   * `domain` - DNS Domain to update.
+  * `ps_setup_script` - PowerShell script for initial setup of Windows host.
 * __Security__
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `ssh_keys` - Names of ssh public keys to add to created hosts.
