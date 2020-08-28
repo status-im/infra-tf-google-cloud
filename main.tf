@@ -122,27 +122,6 @@ resource "google_compute_instance" "host" {
     sysprep-specialize-script-ps1 = var.ps_setup_script
     windows-startup-script-ps1    = var.ps_startup_scipt
   }
-
-  /* bootstrap access to host and basic resources */
-  provisioner "ansible" {
-    plays {
-      playbook {
-        file_path = "${path.cwd}/ansible/bootstrap.yml"
-      }
-
-      hosts  = [self.network_interface.0.access_config.0.nat_ip]
-      groups = [var.group]
-
-      extra_vars = {
-        hostname         = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
-        ansible_host     = google_compute_address.host[count.index].address
-        ansible_ssh_user = var.ssh_user
-        data_center      = local.dc
-        stage            = local.stage
-        env              = var.env
-      }
-    }
-  }
 }
 
 resource "cloudflare_record" "host" {
