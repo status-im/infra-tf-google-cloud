@@ -17,8 +17,9 @@ locals {
 /* RESOURCES ------------------------------------*/
 
 resource "google_compute_address" "host" {
-  name  = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
-  count = var.host_count
+  name   = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
+  region = substr(var.zone, 0, length(var.zone)-2) /* WARNING: Dirty but works */
+  count  = var.host_count
   lifecycle {
     prevent_destroy = true
   }
