@@ -29,8 +29,22 @@ module "google-cloud" {
   * `env` - Environment for these hosts, affects DNS entries.
   * `domain` - DNS Domain to update.
 * __Security__
+  * `ansible_playbook` - Location of the Ansible playbook to run.
   * `ssh_user` - User used to log in to instance (default: `root`)
   * `ssh_keys` - Names of ssh public keys to add to created hosts.
+  * `win_password` - Password for the `admin` user created with `setup.ps1` script.
   * `open_tcp_ports` - TCP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `open_udp_ports` - UDP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `blocked_ips` - IP Address ranges to block. Format: [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (default: `[]`)
+
+# Windows
+
+If you want to create a Windows host you'll have to specify a different `image` and `win_password`.
+You will also most probably have to specify a different bootstrap Ansible playbook.
+```hcl
+module "google-cloud" {
+  image = "windows-cloud/windows-server-2004-dc-core-v20200813"
+  win_password = "my-secret-password"
+  ansible_playbook = "./ansible/win_bootstrap.yml"
+}
+```

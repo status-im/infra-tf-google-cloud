@@ -82,12 +82,13 @@ variable "domain" {
   type        = string
 }
 
-variable "windows_password" {
-  description = "Password for the windows user."
-  type        = string
-}
+/* SECURITY --------------------------------------*/
 
-/* MODULE ----------------------------------------*/
+variable "ansible_playbook" {
+  description = "Location of the ansible playbook to run."
+  type        = string
+  default     = "./ansible/bootstrap.yml"
+}
 
 variable "ssh_user" {
   description = "User used to log in to instance"
@@ -101,7 +102,12 @@ variable "ssh_key" {
   default     = "~/.ssh/status.im/id_rsa.pub" /* TODO this needs to be dynamic */
 }
 
-/* FIREWALL -------------------------------------------*/
+variable "win_password" {
+  description = "Password for the windows user."
+  type        = string
+}
+
+/* FIREWALL --------------------------------------*/
 
 variable "open_tcp_ports" {
   description = "TCP port ranges to enable access from outside. Format: 'N-N'"

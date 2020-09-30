@@ -119,25 +119,33 @@ resource "google_compute_instance" "host" {
     hostname = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
     /* Enable SSH access */
     sshKeys = "${var.ssh_user}:${file(var.ssh_key)}"
+    /* Run PowerShell script for initial setup of a Window machine */
+    sysprep-specialize-script-ps1 = (var.win_password == null ? null :
+      templatefile("${path.module}/setup.ps1", {
+        password = var.win_password
+        ssh_key  = file(var.ssh_key)
+      }))
   }
 
   /* bootstrap access to host and basic resources */
   provisioner "ansible" {
     plays {
-      playbook {
-        file_path = "${path.cwd}/ansible/bootstrap.yml"
-      }
+      playbook { file_path = var.ansible_playbook }
 
       hosts  = [self.network_interface.0.access_config.0.nat_ip]
       groups = [var.group]
 
       extra_vars = {
-        hostname         = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
-        ansible_host     = google_compute_address.host[count.index].address
-        ansible_ssh_user = var.ssh_user
-        data_center      = local.dc
-        stage            = local.stage
-        env              = var.env
+        hostname     = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
+        ansible_host = google_compute_address.host[count.index].address
+        data_center  = local.dc
+        stage        = local.stage
+        env          = var.env
+        /* Depend on OS, windows requires different settings */
+        ansible_ssh_user      = (var.win_password == null ? var.ssh_user : "admin")
+        ansible_shell_type    = (var.win_password == null ? "sh" : "powershell")
+        ansible_become_user   = (var.win_password == null ? null : "admin")
+        ansible_become_method = (var.win_password == null ? null : "runas")
       }
     }
   }
@@ -167,6 +175,10 @@ resource "ansible_host" "host" {
     data_center  = local.dc
     stage        = local.stage
     env          = var.env
+    /* Windows specific settings */
+    ansible_shell_type    = (var.win_password == null ? null : "powershell")
+    ansible_become_user   = (var.win_password == null ? null : "admin")
+    ansible_become_method = (var.win_password == null ? null : "runas")
   }
 }
 
