@@ -1,6 +1,5 @@
 locals {
   public_ips = google_compute_instance.host.*.network_interface.0.access_config.0.nat_ip
-  hostnames  = google_compute_instance.host.*.metadata.hostname
 }
 
 output "public_ips" {

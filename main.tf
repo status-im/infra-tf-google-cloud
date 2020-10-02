@@ -6,18 +6,22 @@ locals {
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
   open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
   open_udp_ports = concat(["655", "8301"], var.open_udp_ports)
-
+  /* tags applied to theinstances */
   tags = [
     var.name, local.stage, var.env,
     "${var.name}-${var.env}-${local.stage}",
   ]
   tags_sorted = sort(distinct(local.tags))
+  /* pre-generated list of hostnames */
+  hostnames = [for i in range(1, var.host_count+1): 
+    "${var.name}-${format("%02d", i)}.${local.dc}.${var.env}.${local.stage}"
+  ]
 }
 
 /* RESOURCES ------------------------------------*/
 
 resource "google_compute_address" "host" {
-  name   = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
+  name   = replace(local.hostnames[count.index], ".", "-")
   region = substr(var.zone, 0, length(var.zone)-2) /* WARNING: Dirty but works */
   count  = var.host_count
   lifecycle {
@@ -59,7 +63,7 @@ resource "google_compute_firewall" "deny" {
 }
 
 resource "google_compute_disk" "host" {
-  name  = "data-${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
+  name  = "data-${local.hostnames[count.index]}"
   type  = var.data_vol_type
   zone  = var.zone
   size  = var.data_vol_size
@@ -73,11 +77,12 @@ resource "google_compute_disk" "host" {
 }
 
 resource "google_compute_instance" "host" {
-  name  = "${var.name}-${format("%02d", count.index + 1)}-${local.dc}-${var.env}-${local.stage}"
-  zone  = var.zone
-  count = var.host_count
+  name     = replace(local.hostnames[count.index], ".", "-")
 
-  machine_type     = var.type
+  /* scaling */
+  zone         = var.zone
+  count        = var.host_count
+  machine_type = var.type
 
   /* enable changing machine_type */
   allow_stopping_for_update = true
@@ -116,7 +121,7 @@ resource "google_compute_instance" "host" {
     env   = var.env
     group = var.group
     /* This is a hack because we can't use dots in actual instance name */
-    hostname = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
+    hostname = local.hostnames[count.index]
     /* Enable SSH access */
     sshKeys = "${var.ssh_user}:${file(var.ssh_key)}"
     /* Run PowerShell script for initial setup of a Window machine */
@@ -136,7 +141,7 @@ resource "google_compute_instance" "host" {
       groups = [var.group]
 
       extra_vars = {
-        hostname     = "${var.name}-${format("%02d", count.index + 1)}.${local.dc}.${var.env}.${local.stage}"
+        hostname     = local.hostnames[count.index]
         ansible_host = google_compute_address.host[count.index].address
         data_center  = local.dc
         stage        = local.stage
