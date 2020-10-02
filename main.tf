@@ -78,6 +78,7 @@ resource "google_compute_disk" "host" {
 
 resource "google_compute_instance" "host" {
   name     = replace(local.hostnames[count.index], ".", "-")
+  hostname = "${local.hostnames[count.index]}.${var.domain}"
 
   /* scaling */
   zone         = var.zone
