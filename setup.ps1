@@ -1,159 +1,6 @@
-##########################################################
-# This script creates the admin user and starts OpenSSH. #
-##########################################################
-
-# Make sure Try/Catch blocks work correctly
-$ErrorActionPreference = 'Stop'
-
-# The helper Create-NewProfile function was copied from:
-# https://gist.github.com/crshnbrn66/7e81bf20408c05ddb2b4fdf4498477d8
-
-#function to register a native method
-function Register-NativeMethod {
-    [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
-    Param
-    (
-        # Param1 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=0)]
-        [string]$dll,
- 
-        # Param2 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=1)]
-        [string]
-        $methodSignature
-    )
- 
-    $script:nativeMethods += [PSCustomObject]@{ Dll = $dll; Signature = $methodSignature; }
-}
-
-function Get-Win32LastError {
-    [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
-    Param($typeName = 'LastError')
- if (-not ([System.Management.Automation.PSTypeName]$typeName).Type)
-    {
-    $lasterrorCode = $script:lasterror | ForEach-Object{
-        '[DllImport("kernel32.dll", SetLastError = true)]
-         public static extern uint GetLastError();'
-    }
-        Add-Type @"
-        using System;
-        using System.Text;
-        using System.Runtime.InteropServices;
-        public static class $typeName {
-            $lasterrorCode
-        }
-"@
-    }
-}
-
-#function to add native method
-function Add-NativeMethods
-{
-    [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
-    Param($typeName = 'NativeMethods')
- 
-    $nativeMethodsCode = $script:nativeMethods | ForEach-Object { "
-        [DllImport(`"$($_.Dll)`")]
-        public static extern $($_.Signature);
-    " }
- 
-    Add-Type @"
-        using System;
-        using System.Text;
-        using System.Runtime.InteropServices;
-        public static class $typeName {
-            $nativeMethodsCode
-        }
-"@
-}
-
-#Main function to create the new user profile
-function Create-NewProfile {
-    [CmdletBinding()]
-    [Alias()]
-    [OutputType([int])]
-    Param
-    (
-        # Param1 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=0)]
-        [string]
-        $UserName,
-        # Param2 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=1)]
-        [string]
-        $Password,
-        # Param2 help description
-        [Parameter(Mandatory=$true,
-                   ValueFromPipelineByPropertyName=$true,
-                   Position=2)]
-        [string]
-        $Description
-    )
-  
-    Write-Verbose "Creating local user $Username";
-  
-    $secPass = ConvertTo-SecureString "${password}" -AsPlainText -Force
-    try {
-        New-LocalUser `
-            -Name $UserName `
-            -Password $secPass `
-            -Description $Description `
-            -PasswordNeverExpires `
-            -AccountNeverExpires;
-    } catch {
-        Write-Error $_.Exception.Message;
-        break;
-    }
-    $methodName = 'UserEnvCP'
-    $script:nativeMethods = @();
- 
-    if (-not ([System.Management.Automation.PSTypeName]$MethodName).Type) {
-        Register-NativeMethod "userenv.dll" "int CreateProfile([MarshalAs(UnmanagedType.LPWStr)] string pszUserSid,`
-         [MarshalAs(UnmanagedType.LPWStr)] string pszUserName,`
-         [Out][MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszProfilePath, uint cchProfilePath)";
- 
-        Add-NativeMethods -typeName $MethodName;
-    }
- 
-    $localUser = New-Object System.Security.Principal.NTAccount("$UserName");
-    $userSID = $localUser.Translate([System.Security.Principal.SecurityIdentifier]);
-    $sb = new-object System.Text.StringBuilder(260);
-    $pathLen = $sb.Capacity;
- 
-    Write-Verbose "Creating user profile for $Username";
- 
-    try {
-        [UserEnvCP]::CreateProfile($userSID.Value, $Username, $sb, $pathLen) | Out-Null;
-    } catch {
-        Write-Error $_.Exception.Message;
-        break;
-    }
-}
-
-# Helper for adding user to group
-function Add-UserToGroup($Username, $Group) {
-    $Hostname = (Get-WmiObject Win32_ComputerSystem).Name
-    If ((Get-LocalGroupMember $Group).Name -contains "$Hostname\$Username") {
-        Write-Host "User '$Username' is already in the '$Group' group!"
-    } Else {
-        Write-Host "Adding '$Username' to the '$Group' group..."
-        Add-LocalGroupMember -Group $Group -Member $Username
-    }
-}
+##############################################################
+# This script enables Administrator user and starts OpenSSH. #
+##############################################################
 
 # Helper for adding a public key to authorized_keys for administrators
 function Set-AdminSSHPublicKey($PublicKey) {
@@ -167,16 +14,20 @@ function Set-AdminSSHPublicKey($PublicKey) {
     $acl | Set-Acl
 }
 
-#-------------------------------------------------------------------------------
+#-----------------------------------------------------------
 
-# Template password and SSH key from Terraform
-$password = "${password}"
+Write-Host ">>> START: Initial Bootstrapping Script"
+
+# Make sure Try/Catch blocks work correctly
+$ErrorActionPreference = 'Stop'
+
+# Template SSH key from Terraform
+$password = "${password}" | ConvertTo-SecureString -AsPlainText -Force
 $publickey = "${ssh_key}"
 
-# Set password for admin and make him admin
-Create-NewProfile -Username admin -Password $password -Description "Administrator"
-Add-UserToGroup -Username admin -Group "Administrators"
-Add-UserToGroup -Username admin -Group "Remote Desktop Users"
+Write-Host "Enable Administrator account..."
+Set-LocalUser -Name Administrator -Password $password
+Enable-LocalUser -Name Administrator
 
 Write-Host "Installing Scoop package manager..."
 iwr -useb get.scoop.sh | iex
@@ -202,3 +53,5 @@ New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell `
 Write-Host "Starting OpenSSH Server..."
 Start-Service sshd
 Set-Service -Name sshd -StartupType 'Automatic'
+
+Write-Host ">>> END: Initial Bootstrapping Script"

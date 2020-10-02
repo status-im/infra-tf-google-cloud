@@ -148,9 +148,9 @@ resource "google_compute_instance" "host" {
         stage        = local.stage
         env          = var.env
         /* Depend on OS, windows requires different settings */
-        ansible_ssh_user      = (var.win_password == null ? var.ssh_user : "admin")
+        ansible_ssh_user      = (var.win_password == null ? var.ssh_user : "Administrator")
         ansible_shell_type    = (var.win_password == null ? "sh" : "powershell")
-        ansible_become_user   = (var.win_password == null ? null : "admin")
+        ansible_become_user   = (var.win_password == null ? null : "Administrator")
         ansible_become_method = (var.win_password == null ? null : "runas")
       }
     }
