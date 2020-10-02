@@ -94,6 +94,7 @@ resource "google_compute_instance" "host" {
     initialize_params {
       image = var.image
       size  = var.root_vol_size
+      type  = var.root_vol_type
     }
   }
 

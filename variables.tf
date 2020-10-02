@@ -26,6 +26,12 @@ variable "root_vol_size" {
   default     = 10 /* 0 should default to size of base image */
 }
 
+variable "root_vol_type" {
+  description = "Size of the base image."
+  type        = string
+  default     = "pd-standard"
+}
+
 /* Use: gcloud compute disk-types list */
 variable "data_vol_type" {
   description = "Type of the extra data volume."
