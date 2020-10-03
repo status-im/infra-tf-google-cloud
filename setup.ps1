@@ -32,8 +32,8 @@ Enable-LocalUser -Name Administrator
 Write-Host "Installing Scoop package manager..."
 iwr -useb get.scoop.sh | iex
 
-Write-Host "Installing Python for Ansible..."
-scoop install --global python
+Write-Host "Installing Python and Git for Ansible..."
+scoop install --global python git
 
 # Install OpenSSH
 Write-Host "Installing OpenSSH Server..."
@@ -46,12 +46,11 @@ Set-AdminSSHPublicKey -PublicKey $publickey
 # Set default OpenSSH shell to PowerShell
 Write-Host "Changing default shell to PowerShell..."
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell `
-    -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" `
+    -Value "C:\ProgramData\scoop\apps\git\current\bin\bash.exe" `
     -PropertyType String -Force
 
 # Finally start the service
 Write-Host "Starting OpenSSH Server..."
-Start-Service sshd
 Set-Service -Name sshd -StartupType 'Automatic'
 
 Write-Host ">>> END: Initial Bootstrapping Script"
