@@ -63,7 +63,7 @@ resource "google_compute_firewall" "deny" {
 }
 
 resource "google_compute_disk" "host" {
-  name  = "data-${local.hostnames[count.index]}"
+  name  = "data-${replace(local.hostnames[count.index], ".", "-")}"
   type  = var.data_vol_type
   zone  = var.zone
   size  = var.data_vol_size
