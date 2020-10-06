@@ -111,6 +111,7 @@ variable "ssh_key" {
 variable "win_password" {
   description = "Password for the windows user."
   type        = string
+  default     = null
 }
 
 /* FIREWALL --------------------------------------*/
