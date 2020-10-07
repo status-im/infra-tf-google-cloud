@@ -99,9 +99,9 @@ resource "google_compute_instance" "host" {
   }
 
   dynamic "attached_disk" {
-    for_each = google_compute_disk.host
+    for_each = var.data_vol_size > 0 ? [ google_compute_disk.host[0] ] : []
     content {
-      device_name = "persistent-disk-${count.index+1}"
+      device_name = google_compute_disk.host[count.index].name
       source      = google_compute_disk.host[count.index].self_link
     }
   }
