@@ -3,6 +3,7 @@
 /* We default to: statusim.net */
 variable "cf_zone_id" {
   description = "ID of CloudFlare zone for host record."
+  type        = string
   default     = "14660d10344c9898521c4ba49789f563"
 }
 
@@ -17,7 +18,7 @@ variable "host_count" {
 variable "type" {
   description = "Type of machine to deploy."
   type        = string
-  default = "n1-standard-1"
+  default     = "n1-standard-1"
 }
 
 variable "root_vol_size" {
@@ -49,7 +50,7 @@ variable "data_vol_size" {
 variable "zone" {
   description = "Specific zone in which to deploy hosts."
   type        = string
-  default = "us-central1-a"
+  default     = "us-central1-a"
 }
 
 /* Use: 'gcloud compute images list --filter=ubuntu' */
