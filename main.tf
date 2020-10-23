@@ -108,7 +108,7 @@ resource "google_compute_instance" "host" {
 
   /* Ignore changes to size of boot_disk */
   lifecycle {
-    ignore_changes = [ boot_disk ]
+    ignore_changes = [ boot_disk, hostname ]
   }
 
   network_interface {
