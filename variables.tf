@@ -79,6 +79,12 @@ variable "env" {
   type        = string
 }
 
+variable "stage" {
+  description = "Name of stage, like prod, dev, or staging."
+  type        = string
+  default     = ""
+}
+
 variable "group" {
   description = "Ansible group to assign hosts to."
   type        = string

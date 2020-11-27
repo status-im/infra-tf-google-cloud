@@ -28,6 +28,7 @@ module "google-cloud" {
   * `name` - Prefix of hostname before index. (default: `node`)
   * `group` - Name of Ansible group to add hosts to.
   * `env` - Environment for these hosts, affects DNS entries.
+  * `stage` - Name of stage, like `prod`, `dev`, or `staging`.
   * `domain` - DNS Domain to update.
 * __Security__
   * `ansible_playbook` - Location of the Ansible playbook to run.

@@ -1,7 +1,7 @@
 /* DERIVED --------------------------------------*/
 
 locals {
-  stage = terraform.workspace
+  stage = var.stage != "" ? var.stage : terraform.workspace
   dc    = "${var.provider_name}-${var.zone}"
   /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
   open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
