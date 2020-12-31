@@ -14,7 +14,8 @@ variable "host_count" {
   type        = number
 }
 
-/* https://cloud.google.com/compute/docs/machine-types */
+/* https://cloud.google.com/compute/docs/machine-types
+ * Use: `gcloud compute machine-types list --filter="zone=us-central1-a"` */
 variable "type" {
   description = "Type of machine to deploy."
   type        = string
@@ -46,7 +47,8 @@ variable "data_vol_size" {
   default     = 0
 }
 
-/* https://cloud.google.com/compute/docs/regions-zones/ */
+/* https://cloud.google.com/compute/docs/regions-zones/
+ * Use: `gcloud compute zones list` */
 variable "zone" {
   description = "Specific zone in which to deploy hosts."
   type        = string
