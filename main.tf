@@ -132,6 +132,9 @@ resource "google_compute_instance" "host" {
         password = var.win_password
         ssh_key  = file(var.ssh_key)
       }))
+
+    /* Allow debugging via `connect-to-serial-port`. */
+    //serial-port-enable = true
   }
 
   /* bootstrap access to host and basic resources */

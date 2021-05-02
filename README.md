@@ -50,3 +50,9 @@ module "google-cloud" {
   ansible_playbook = "./ansible/win_bootstrap.yml"
 }
 ```
+
+You can help yourself debug boot process of new instances using the following command:
+```sh
+gcloud beta compute connect-to-serial-port "${INSTANCE_NAME}"
+```
+But it requires the `serial-port-enable` metadata attribute to be true for the given host.
