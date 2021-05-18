@@ -134,7 +134,7 @@ resource "google_compute_instance" "host" {
       }))
 
     /* Allow debugging via `connect-to-serial-port`. */
-    //serial-port-enable = true
+    serial-port-enable = true
   }
 
   /* bootstrap access to host and basic resources */
