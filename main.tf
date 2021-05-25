@@ -177,7 +177,6 @@ resource "ansible_host" "host" {
   count  = var.host_count
 
   vars = {
-    ansible_user = "admin"
     ansible_host = google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip
     hostname     = google_compute_instance.host[count.index].metadata.hostname
     region       = google_compute_instance.host[count.index].zone
