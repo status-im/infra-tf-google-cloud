@@ -125,12 +125,12 @@ resource "google_compute_instance" "host" {
     /* This is a hack because we can't use dots in actual instance name */
     hostname = local.hostnames[count.index]
     /* Enable SSH access */
-    sshKeys = "${var.ssh_user}:${file(var.ssh_key)}"
+    ssh-keys = join("\n", [for key in var.ssh_keys : "${var.ssh_user}:${key}"])
     /* Run PowerShell script for initial setup of a Window machine */
     sysprep-specialize-script-ps1 = (var.win_password == null ? null :
       templatefile("${path.module}/setup.ps1", {
         password = var.win_password
-        ssh_key  = file(var.ssh_key)
+        ssh_key  = file(var.ssh_keys[0])
       }))
 
     /* Allow debugging via `connect-to-serial-port`. */
