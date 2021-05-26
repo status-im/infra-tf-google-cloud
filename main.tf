@@ -125,7 +125,7 @@ resource "google_compute_instance" "host" {
     /* This is a hack because we can't use dots in actual instance name */
     hostname = local.hostnames[count.index]
     /* Enable SSH access */
-    sshKeys = "${var.ssh_user}:${file(var.ssh_key)}"
+    ssh-keys = join("\n", [for key in var.ssh_keys : "root:${key}"])
     /* Run PowerShell script for initial setup of a Window machine */
     sysprep-specialize-script-ps1 = (var.win_password == null ? null :
       templatefile("${path.module}/setup.ps1", {
