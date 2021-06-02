@@ -51,8 +51,9 @@ module "google-cloud" {
 }
 ```
 
-You can help yourself debug boot process of new instances using the following command:
+You can help yourself debug boot process of new instances using the following commands:
 ```sh
 gcloud beta compute connect-to-serial-port "${INSTANCE_NAME}"
+gcloud beta compute instances get-serial-port-output "${INSTANCE_NAME}"
 ```
 But it requires the `serial-port-enable` metadata attribute to be true for the given host.
