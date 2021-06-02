@@ -130,7 +130,7 @@ resource "google_compute_instance" "host" {
     sysprep-specialize-script-ps1 = (var.win_password == null ? null :
       templatefile("${path.module}/setup.ps1", {
         password = var.win_password
-        ssh_key  = file(var.ssh_keys[0])
+        ssh_key  = var.ssh_keys[0]
       }))
 
     /* Allow debugging via `connect-to-serial-port`. */
