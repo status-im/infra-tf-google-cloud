@@ -136,13 +136,30 @@ resource "google_compute_instance" "host" {
     /* Allow debugging via `connect-to-serial-port`. */
     serial-port-enable = true
   }
+}
+
+resource "null_resource" "host" {
+  count = var.host_count
+
+  /* Trigger bootstrapping on host or public IP change. */
+  triggers = {
+    instance_id = google_compute_instance.host[count.index].id
+    address_id = google_compute_address.host[count.index].id
+  }
+
+  /* Make sure everything is in place before bootstrapping. */
+  depends_on = [
+    google_compute_instance.host,
+    google_compute_address.host,
+    google_compute_disk.host,
+  ]
 
   /* bootstrap access to host and basic resources */
   provisioner "ansible" {
     plays {
       playbook { file_path = var.ansible_playbook }
 
-      hosts  = [self.network_interface.0.access_config.0.nat_ip]
+      hosts  = [google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip]
       groups = [var.group]
 
       extra_vars = {
