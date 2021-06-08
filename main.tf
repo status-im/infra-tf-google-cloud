@@ -169,7 +169,7 @@ resource "null_resource" "host" {
         stage        = local.stage
         env          = var.env
         /* Depend on OS, windows requires different settings */
-        ansible_ssh_user      = (var.win_password == null ? var.ssh_user : "Administrator")
+        ansible_user          = (var.win_password == null ? var.ssh_user : "Administrator")
         ansible_shell_type    = (var.win_password == null ? "sh" : "powershell")
         ansible_become_user   = (var.win_password == null ? null : "Administrator")
         ansible_become_method = (var.win_password == null ? null : "runas")
@@ -190,7 +190,7 @@ resource "cloudflare_record" "host" {
 resource "ansible_host" "host" {
   inventory_hostname = google_compute_instance.host[count.index].metadata.hostname
 
-  groups = [var.group, local.dc]
+  groups = ["${var.env}.${local.stage}", var.group, local.dc]
   count  = var.host_count
 
   vars = {
