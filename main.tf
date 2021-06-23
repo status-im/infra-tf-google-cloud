@@ -13,7 +13,7 @@ locals {
   ]
   tags_sorted = sort(distinct(local.tags))
   /* pre-generated list of hostnames */
-  hostnames = [for i in range(1, var.host_count+1): 
+  hostnames = [for i in range(1, var.host_count + 1) :
     "${var.name}-${format("%02d", i)}.${local.dc}.${var.env}.${local.stage}"
   ]
 }
@@ -22,7 +22,7 @@ locals {
 
 resource "google_compute_address" "host" {
   name   = replace(local.hostnames[count.index], ".", "-")
-  region = substr(var.zone, 0, length(var.zone)-2) /* WARNING: Dirty but works */
+  region = substr(var.zone, 0, length(var.zone) - 2) /* WARNING: Dirty but works */
   count  = var.host_count
   lifecycle {
     prevent_destroy = true
@@ -36,11 +36,11 @@ resource "google_compute_firewall" "host" {
 
   allow {
     protocol = "tcp"
-    ports = local.open_tcp_ports
+    ports    = local.open_tcp_ports
   }
   allow {
     protocol = "udp"
-    ports = local.open_udp_ports
+    ports    = local.open_udp_ports
   }
 }
 
@@ -72,7 +72,7 @@ resource "google_compute_disk" "host" {
   lifecycle {
     prevent_destroy = true
     /* We do this to avoid destrying a volume unnecesarily */
-    ignore_changes = [ name ]
+    ignore_changes = [name]
   }
 }
 
@@ -99,7 +99,7 @@ resource "google_compute_instance" "host" {
   }
 
   dynamic "attached_disk" {
-    for_each = var.data_vol_size > 0 ? [ google_compute_disk.host[0] ] : []
+    for_each = var.data_vol_size > 0 ? [google_compute_disk.host[0]] : []
     content {
       device_name = google_compute_disk.host[count.index].name
       source      = google_compute_disk.host[count.index].self_link
@@ -108,7 +108,7 @@ resource "google_compute_instance" "host" {
 
   /* Ignore changes to size of boot_disk */
   lifecycle {
-    ignore_changes = [ boot_disk, hostname ]
+    ignore_changes = [boot_disk, hostname]
   }
 
   network_interface {
@@ -131,7 +131,8 @@ resource "google_compute_instance" "host" {
       templatefile("${path.module}/setup.ps1", {
         password = var.win_password
         ssh_key  = var.ssh_keys[0]
-      }))
+      })
+    )
 
     /* Allow debugging via `connect-to-serial-port`. */
     serial-port-enable = true
@@ -144,7 +145,7 @@ resource "null_resource" "host" {
   /* Trigger bootstrapping on host or public IP change. */
   triggers = {
     instance_id = google_compute_instance.host[count.index].id
-    address_id = google_compute_address.host[count.index].id
+    address_id  = google_compute_address.host[count.index].id
   }
 
   /* Make sure everything is in place before bootstrapping. */

@@ -1,10 +1,9 @@
 /* DNS ------------------------------------------*/
 
-/* We default to: statusim.net */
 variable "cf_zone_id" {
   description = "ID of CloudFlare zone for host record."
   type        = string
-  default     = "14660d10344c9898521c4ba49789f563"
+  default     = "14660d10344c9898521c4ba49789f563" /* statusim.net */
 }
 
 /* SCALING ---------------------------------------*/
@@ -14,12 +13,11 @@ variable "host_count" {
   type        = number
 }
 
-/* https://cloud.google.com/compute/docs/machine-types
- * Use: `gcloud compute machine-types list --filter="zone=us-central1-a"` */
 variable "type" {
   description = "Type of machine to deploy."
   type        = string
   default     = "n1-standard-1"
+  /* cmd: `gcloud compute machine-types list --filter="zone=us-central1-a"` */
 }
 
 variable "root_vol_size" {
@@ -34,11 +32,11 @@ variable "root_vol_type" {
   default     = "pd-standard"
 }
 
-/* Use: gcloud compute disk-types list */
 variable "data_vol_type" {
   description = "Type of the extra data volume."
   type        = string
   default     = "pd-balanced"
+  /* Use: gcloud compute disk-types list */
 }
 
 variable "data_vol_size" {
@@ -47,19 +45,18 @@ variable "data_vol_size" {
   default     = 0
 }
 
-/* https://cloud.google.com/compute/docs/regions-zones/
- * Use: `gcloud compute zones list` */
 variable "zone" {
   description = "Specific zone in which to deploy hosts."
   type        = string
   default     = "us-central1-a"
+  /* cmd: `gcloud compute zones list` */
 }
 
-/* Use: 'gcloud compute images list --filter=ubuntu' */
 variable "image" {
   description = "OS image to use when deploying hosts."
   type        = string
   default     = "ubuntu-os-cloud/ubuntu-2004-lts"
+  /* cmd: `gcloud compute images list --filter=ubuntu` */
 }
 
 variable "provider_name" {
@@ -140,10 +137,10 @@ variable "open_udp_ports" {
   default     = []
 }
 
-/* See: https://www.terraform.io/docs/providers/google/r/compute_firewall.html */
 variable "blocked_ips" {
   description = "List of source IP ranges for which we want to block access."
   type        = list(string)
   default     = []
+  /* See: https://www.terraform.io/docs/providers/google/r/compute_firewall.html */
 }
 
