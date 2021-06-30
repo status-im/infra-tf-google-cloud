@@ -172,6 +172,7 @@ resource "null_resource" "host" {
         /* Depend on OS, windows requires different settings */
         ansible_user          = (var.win_password == null ? var.ssh_user : "Administrator")
         ansible_shell_type    = (var.win_password == null ? "sh" : "powershell")
+        ansible_become        = (var.win_password == null ? null : "false")
         ansible_become_method = (var.win_password == null ? null : "runas")
       }
     }
