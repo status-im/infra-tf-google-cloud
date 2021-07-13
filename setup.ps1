@@ -21,6 +21,10 @@ Write-Host ">>> START: Initial Bootstrapping Script"
 # Make sure Try/Catch blocks work correctly
 $ErrorActionPreference = 'Stop'
 
+# Make full hostname available via ENV
+[Environment]::SetEnvironmentVariable("FULLHOSTNAME", "${hostname}", "Machine")
+[Environment]::SetEnvironmentVariable("FQDN", "${hostname}.${domain}", "Machine")
+
 # Template SSH key from Terraform
 $password = "${password}" | ConvertTo-SecureString -AsPlainText -Force
 $publickey = "${ssh_key}"

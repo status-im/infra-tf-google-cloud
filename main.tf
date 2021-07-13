@@ -129,6 +129,8 @@ resource "google_compute_instance" "host" {
     /* Run PowerShell script for initial setup of a Window machine */
     sysprep-specialize-script-ps1 = (var.win_password == null ? null :
       templatefile("${path.module}/setup.ps1", {
+        hostname = local.hostnames[count.index]
+        domain   = var.domain
         password = var.win_password
         ssh_key  = var.ssh_keys[0]
       })
