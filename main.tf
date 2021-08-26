@@ -3,9 +3,9 @@
 locals {
   stage = var.stage != "" ? var.stage : terraform.workspace
   dc    = "${var.provider_name}-${var.zone}"
-  /* always add SSH, Tinc, Netdata, and Consul to allowed ports */
-  open_tcp_ports = concat(["22", "655", "8000", "8301"], var.open_tcp_ports)
-  open_udp_ports = concat(["51820", "655", "8301"], var.open_udp_ports)
+  /* always add SSH, WireGuard, and Consul to allowed ports */
+  open_tcp_ports = concat(["22", "8301"], var.open_tcp_ports)
+  open_udp_ports = concat(["51820", "8301"], var.open_udp_ports)
   /* tags applied to theinstances */
   tags = [
     var.name, local.stage, var.env,
