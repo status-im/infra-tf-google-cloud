@@ -83,7 +83,7 @@ resource "google_compute_instance" "host" {
   for_each = toset(local.hostnames)
 
   name     = replace(each.key, ".", "-")
-  hostname = "${each.key}.${var.domain}"
+  hostname = each.key
 
   /* scaling */
   zone         = var.zone
@@ -209,7 +209,7 @@ resource "ansible_host" "host" {
     ansible_host = each.value.network_interface.0.access_config.0.nat_ip
     hostname     = each.key
     region       = each.value.zone
-    dns_entry    = each.value.hostname
+    dns_entry    = each.value.metadata.dns_entry
     data_center  = local.dc
     stage        = local.stage
     env          = var.env
