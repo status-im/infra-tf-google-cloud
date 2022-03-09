@@ -21,9 +21,11 @@ locals {
 /* RESOURCES ------------------------------------*/
 
 resource "google_compute_address" "host" {
-  name   = replace(local.hostnames[count.index], ".", "-")
+  for_each = toset(local.hostnames)
+
+  name   = replace(each.key, ".", "-")
   region = substr(var.zone, 0, length(var.zone) - 2) /* WARNING: Dirty but works */
-  count  = var.host_count
+
   lifecycle {
     prevent_destroy = true
   }
@@ -63,11 +65,12 @@ resource "google_compute_firewall" "deny" {
 }
 
 resource "google_compute_disk" "host" {
-  name  = "data-${replace(local.hostnames[count.index], ".", "-")}"
-  type  = var.data_vol_type
-  zone  = var.zone
-  size  = var.data_vol_size
-  count = var.data_vol_size > 0 ? var.host_count : 0
+  for_each = toset([ for h in local.hostnames : h if var.data_vol_size > 0 ])
+
+  name = "data-${replace(each.key, ".", "-")}"
+  type = var.data_vol_type
+  zone = var.zone
+  size = var.data_vol_size
 
   lifecycle {
     prevent_destroy = true
@@ -77,12 +80,13 @@ resource "google_compute_disk" "host" {
 }
 
 resource "google_compute_instance" "host" {
-  name     = replace(local.hostnames[count.index], ".", "-")
-  hostname = "${local.hostnames[count.index]}.${var.domain}"
+  for_each = toset(local.hostnames)
+
+  name     = replace(each.key, ".", "-")
+  hostname = "${each.key}.${var.domain}"
 
   /* scaling */
   zone         = var.zone
-  count        = var.host_count
   machine_type = var.type
 
   /* enable changing machine_type */
@@ -101,8 +105,8 @@ resource "google_compute_instance" "host" {
   dynamic "attached_disk" {
     for_each = var.data_vol_size > 0 ? [google_compute_disk.host[0]] : []
     content {
-      device_name = google_compute_disk.host[count.index].name
-      source      = google_compute_disk.host[count.index].self_link
+      device_name = google_compute_disk.host[each.key].name
+      source      = google_compute_disk.host[each.key].self_link
     }
   }
 
@@ -114,22 +118,21 @@ resource "google_compute_instance" "host" {
   network_interface {
     network = "default"
     access_config {
-      nat_ip = google_compute_address.host[count.index].address
+      nat_ip = google_compute_address.host[each.key].address
     }
   }
 
   metadata = {
-    node  = var.name
-    env   = var.env
-    group = var.group
-    /* This is a hack because we can't use dots in actual instance name */
-    hostname = local.hostnames[count.index]
+    hostname = each.key
+    node     = var.name
+    env      = var.env
+    group    = var.group
     /* Enable SSH access */
     ssh-keys = join("\n", [for key in var.ssh_keys : "${var.ssh_user}:${key}"])
     /* Run PowerShell script for initial setup of a Window machine */
     sysprep-specialize-script-ps1 = (var.win_password == null ? null :
       templatefile("${path.module}/setup.ps1", {
-        hostname = local.hostnames[count.index]
+        hostname = each.key
         domain   = var.domain
         password = var.win_password
         ssh_key  = var.ssh_keys[0]
@@ -142,12 +145,12 @@ resource "google_compute_instance" "host" {
 }
 
 resource "null_resource" "host" {
-  count = var.host_count
+  for_each = google_compute_instance.host
 
   /* Trigger bootstrapping on host or public IP change. */
   triggers = {
-    instance_id = google_compute_instance.host[count.index].id
-    address_id  = google_compute_address.host[count.index].id
+    instance_id = each.value.id
+    address_id  = google_compute_address.host[each.key].id
   }
 
   /* Make sure everything is in place before bootstrapping. */
@@ -162,12 +165,12 @@ resource "null_resource" "host" {
     plays {
       playbook { file_path = var.ansible_playbook }
 
-      hosts  = [google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip]
+      hosts  = [each.value.network_interface.0.access_config.0.nat_ip]
       groups = [var.group]
 
       extra_vars = {
-        hostname     = local.hostnames[count.index]
-        ansible_host = google_compute_address.host[count.index].address
+        hostname     = each.key
+        ansible_host = google_compute_address.host[each.key].address
         data_center  = local.dc
         stage        = local.stage
         env          = var.env
@@ -182,25 +185,27 @@ resource "null_resource" "host" {
 }
 
 resource "cloudflare_record" "host" {
+  for_each = google_compute_instance.host
+
   zone_id = var.cf_zone_id
-  count   = var.host_count
-  name    = google_compute_instance.host[count.index].metadata.hostname
-  value   = google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip
+  name    = each.value.metadata.hostname
+  value   = each.value.network_interface.0.access_config.0.nat_ip
   type    = "A"
   ttl     = 3600
 }
 
 resource "ansible_host" "host" {
-  inventory_hostname = google_compute_instance.host[count.index].metadata.hostname
+  for_each = google_compute_instance.host
+
+  inventory_hostname = each.key
 
   groups = ["${var.env}.${local.stage}", var.group, local.dc]
-  count  = var.host_count
 
   vars = {
-    ansible_host = google_compute_instance.host[count.index].network_interface.0.access_config.0.nat_ip
-    hostname     = google_compute_instance.host[count.index].metadata.hostname
-    region       = google_compute_instance.host[count.index].zone
-    dns_entry    = "${google_compute_instance.host[count.index].metadata.hostname}.${var.domain}"
+    ansible_host = each.value.network_interface.0.access_config.0.nat_ip
+    hostname     = each.key
+    region       = each.value.zone
+    dns_entry    = each.value.hostname
     data_center  = local.dc
     stage        = local.stage
     env          = var.env
