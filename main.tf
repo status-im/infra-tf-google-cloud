@@ -126,10 +126,11 @@ resource "google_compute_instance" "host" {
   }
 
   metadata = {
-    hostname = each.key
-    node     = var.name
-    env      = var.env
-    group    = var.group
+    dns_entry = "${each.key}.${var.domain}"
+    hostname  = each.key
+    node      = var.name
+    env       = var.env
+    group     = var.group
     /* Enable SSH access */
     ssh-keys = join("\n", [for key in var.ssh_keys : "${var.ssh_user}:${key}"])
     /* Run PowerShell script for initial setup of a Window machine */
