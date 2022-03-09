@@ -103,10 +103,13 @@ resource "google_compute_instance" "host" {
   }
 
   dynamic "attached_disk" {
-    for_each = var.data_vol_size > 0 ? [google_compute_disk.host[0]] : []
+    for_each = {
+      for k,v in google_compute_disk.host :
+        k => v if k == each.key
+    }
     content {
-      device_name = google_compute_disk.host[each.key].name
-      source      = google_compute_disk.host[each.key].self_link
+      device_name = attached_disk.value.name
+      source      = attached_disk.value.self_link
     }
   }
 
