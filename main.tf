@@ -32,9 +32,11 @@ resource "google_compute_address" "host" {
 }
 
 resource "google_compute_firewall" "host" {
-  name        = "allow-${var.name}-${var.zone}-${var.env}-${local.stage}"
-  network     = "default"
-  target_tags = ["${var.name}-${var.env}-${local.stage}"]
+  name    = "allow-${var.name}-${var.zone}-${var.env}-${local.stage}"
+  network = "default"
+
+  target_tags   = ["${var.name}-${var.env}-${local.stage}"]
+  source_ranges = ["0.0.0.0/0"]
 
   allow {
     protocol = "tcp"
