@@ -55,7 +55,7 @@ variable "zone" {
 variable "image" {
   description = "OS image to use when deploying hosts."
   type        = string
-  default     = "ubuntu-os-cloud/ubuntu-2004-lts"
+  default     = "ubuntu-os-cloud/ubuntu-2204-lts"
   /* cmd: `gcloud compute images list --filter=ubuntu` */
 }
 
