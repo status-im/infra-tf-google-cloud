@@ -34,7 +34,7 @@ Set-LocalUser -Name Administrator -Password $password
 Enable-LocalUser -Name Administrator
 
 Write-Host "Installing Scoop package manager..."
-iwr -useb get.scoop.sh | iex
+iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
 
 Write-Host "Installing Python and Git for Ansible..."
 scoop install --global python git
