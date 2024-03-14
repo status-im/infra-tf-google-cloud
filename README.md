@@ -29,7 +29,6 @@ module "google-cloud" {
   * `group` - Name of Ansible group to add hosts to.
   * `env` - Environment for these hosts, affects DNS entries.
   * `stage` - Name of stage, like `prod`, `dev`, or `staging`.
-  * `domain` - DNS Domain to update.
 * __Security__
   * `ansible_playbook` - Location of the Ansible playbook to run.
   * `ssh_user` - User used to log in to instance (default: `root`)
@@ -38,6 +37,9 @@ module "google-cloud" {
   * `open_tcp_ports` - TCP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `open_udp_ports` - UDP port ranges to enable access from outside. Format: `N-N` (default: `[]`)
   * `blocked_ips` - IP Address ranges to block. Format: [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) (default: `[]`)
+* __DNS__
+  * `cf_zone_id` - CloudFlare DNS domain zone ID. (ID for `status.im`)
+  * `domain` - DNS Domain for hostnames. (default: `status.im`)
 
 # Windows
 
