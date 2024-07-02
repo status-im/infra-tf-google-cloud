@@ -28,6 +28,7 @@ resource "google_compute_address" "host" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [name]
   }
 }
 
