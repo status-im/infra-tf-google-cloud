@@ -213,6 +213,7 @@ resource "ansible_host" "host" {
     hostname     = each.key
     region       = each.value.zone
     dns_entry    = each.value.metadata.dns_entry
+    host_type    = var.type
     data_center  = local.dc
     stage        = local.stage
     env          = var.env
@@ -222,4 +223,3 @@ resource "ansible_host" "host" {
     ansible_become_method = (var.win_password == null ? null : "runas")
   }
 }
-
